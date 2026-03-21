@@ -5,6 +5,13 @@
 <head>
 
     <meta charset="UTF-8">
+<!DOCTYPE html>
+
+<html lang="th">
+
+<head>
+
+    <meta charset="UTF-8">
 
     <title>Guess the Shoes: Bilingual Edition</title>
 
@@ -12,7 +19,7 @@
 
         @import url('https://fonts.googleapis.com/css2?family=Kanit:wght@300;500&display=swap');
 
-        
+
 
         body {
 
@@ -358,87 +365,137 @@
             { names: ["ซันจิ", "sanji"], img: "images/0106sanji.png" },
 
         ];
-        
 function startGame() {
-    const board = document.getElementById('game-board');
-    if (!board) return;
-    board.innerHTML = '';
 
-    // สุ่มจาก animeData ทั้งหมดทุกครั้ง (ไม่มีการจำ)
-    const shuffled = [...animeData].sort(() => 0.5 - Math.random()).slice(0, 5);
+        const board = document.getElementById('game-board');
 
-    shuffled.forEach((char, i) => {
-        const card = document.createElement('div');
-        card.className = 'character-card';
-        card.id = `card-${i}`;
-        card.dataset.answers = JSON.stringify(char.names);
-        card.dataset.wrongCount = 0; 
+        board.innerHTML = '';
 
-        card.innerHTML = `
-            <div class="img-box" style="position: relative; overflow: hidden; height: 350px; width: 100%; border-radius: 12px; border: 2px solid #333; background: #000; transition: 0.3s; margin-bottom: 15px; display: flex; align-items: flex-end; justify-content: center;">
-                <div class="mask" style="position: absolute; top: 0; left: 0; width: 100%; height: 82%; background: #000; z-index: 2; transition: height 0.5s ease-out; border-bottom: 2px dashed #00d4ff; display: flex; align-items: center; justify-content: center; font-size: 2rem;">🕵️‍♂️</div>
-                <img src="${char.img}" class="character-img" draggable="false" oncontextmenu="return false;" 
-                     style="max-width: 100%; max-height: 100%; width: auto; height: auto; object-fit: contain;">
-            </div>
-            <div class="input-area">
-                <input type="text" placeholder="ชื่อตัวละคร..." id="in-${i}">
-                <button class="check-btn" onclick="checkAnswer(${i})">ตรวจคำตอบ</button>
-            </div>
-            <div class="reveal-name" style="display: none; font-weight: bold; margin-top: 10px; font-size: 1.1rem;">
-                ✨ ${char.names[0]} (${char.names[1].toUpperCase()}) ✨
-            </div>
-        `;
-        board.appendChild(card);
-    });
-}
 
+
+        // สุ่มตัวละคร 5 ตัว
+
+        const shuffled = [...animeData].sort(() => 0.5 - Math.random()).slice(0, 5);
+
+
+
+        shuffled.forEach((char, i) => {
+
+            const card = document.createElement('div');
+
+            card.className = 'character-card';
+
+            card.id = `card-${i}`;
+
+            card.dataset.answers = JSON.stringify(char.names);
+
+
+
+            // บล็อกโค้ดที่แก้ไขใหม่ ให้ภาพอยู่ชิดขอบล่างและไม่ขาด
+
+            card.innerHTML = `
+
+                <div class="img-box" style="position: relative; overflow: hidden; height: 350px; width: 100%; border-radius: 12px; border: 2px solid #333; background: #000; transition: 0.3s; margin-bottom: 15px; display: flex; align-items: flex-end; justify-content: center;">
+
+                    <div class="mask">🕵️‍♂️</div>
+
+                    <img src="${char.img}" class="character-img" draggable="false" oncontextmenu="return false;" 
+
+                         style="max-width: 100%; max-height: 100%; width: auto; height: auto; object-fit: contain; transition: filter 0.5s, transform 0.5s, opacity 0.5s;">
+
+                </div>
+
+                <div class="input-area">
+
+                    <input type="text" placeholder="ชื่อตัวละคร..." id="in-${i}">
+
+                    <button class="check-btn" onclick="checkAnswer(${i})">ตรวจคำตอบ</button>
+
+                </div>
+
+                <div class="reveal-name">✨ ${char.names[0]} (${char.names[1].toUpperCase()}) ✨</div>
+
+            `;
+
+            board.appendChild(card);
+
+        });
+
+    }
+
+
+
+// 1. หาฟังก์ชันนี้ในไฟล์ของคุณ
 function checkAnswer(i) {
+    
+    // --- ลบของเก่าออกให้หมด แล้วเอาโค้ดข้างล่างนี้ไปวางแทน ---
+
     const inputField = document.getElementById(`in-${i}`);
     const userInput = inputField.value.trim().toLowerCase();
     const card = document.getElementById(`card-${i}`);
     const mask = card.querySelector('.mask');
-    const revealArea = card.querySelector('.reveal-name');
     const correctAnswers = JSON.parse(card.dataset.answers);
-    
     const isCorrect = correctAnswers.some(name => name.toLowerCase() === userInput);
+
+    // สร้างระบบนับจำนวนครั้งที่ผิดไว้ที่ตัว card
     let wrongCount = parseInt(card.dataset.wrongCount) || 0;
 
     if (isCorrect) {
-        // ตอบถูก: เปิดภาพ 100% ทันที
+        // แก้บั๊ก: สั่งให้ mask หายไปทันที (ความสูงเป็น 0)
         if (mask) mask.style.height = "0"; 
         card.classList.add('correct');
         card.style.borderColor = "#00ff88";
-        revealArea.style.display = 'block';
-        revealArea.style.color = '#00ff88';
-        card.querySelector('.input-area').style.display = 'none';
     } else {
-        // ตอบผิด: นับจำนวนครั้ง
         wrongCount++;
         card.dataset.wrongCount = wrongCount;
 
-        // ค่อยๆ ลดความสูงของ Mask (เปิดภาพทีละนิด)
+        // คำนวณระดับการเปิดภาพ (จาก 82% ลดลงทีละประมาณ 13.6% จนเหลือ 0%)
+        // คำนวณการเปิดภาพทีละนิด (จาก 82% ลดลงทีละ 13.6%)
         const newHeight = Math.max(0, 82 - (wrongCount * 13.6)); 
         if (mask) mask.style.height = newHeight + "%";
 
         if (wrongCount >= 6) {
-            // ผิดครบ 6 ครั้ง: เปิดหมดและเฉลย
-            if (mask) mask.style.height = "0"; 
+            // กรณีผิดครบ 6 ครั้ง
             card.classList.add('wrong-final'); 
-            revealArea.style.display = 'block';
-            revealArea.style.color = '#ff4444';
-            revealArea.innerHTML = `❌ เฉลยคือ: <b>${correctAnswers[0]}</b>`;
+            if (mask) mask.style.height = "0%"; // เปิดภาพทั้งหมด
+            if (mask) mask.style.height = "0"; 
+
+            const revealArea = card.querySelector('.reveal-name');
+            if (revealArea) {
+                revealArea.style.display = 'block';
+                revealArea.innerHTML = `❌ ตอบผิดเกินกำหนด! เฉลยคือ: ${revealArea.innerHTML}`;
+                const originalName = revealArea.innerText.replace('✨', '').trim();
+                revealArea.innerHTML = `❌ ผิดเกินกำหนด! คือ <b>${originalName}</b>`;
+            }
+            
             card.querySelector('.input-area').style.display = 'none';
         } else {
-            // สั่นเมื่อตอบผิด
+            // เอฟเฟกต์สั่นเมื่อตอบผิดปกติ
+            // เอฟเฟกต์สั่น
             card.style.transform = "translateX(8px)";
             setTimeout(() => card.style.transform = "translateX(-8px)", 80);
             setTimeout(() => card.style.transform = "translateX(0)", 160);
             card.style.borderColor = "#ff4444";
+            setTimeout(() => card.style.borderColor = "#333", 1000);
             setTimeout(() => {
-                if (!card.classList.contains('correct')) card.style.borderColor = "#333";
+                if (!card.classList.contains('correct')) {
+                    card.style.borderColor = "#333";
+                }
             }, 1000);
-            
+
             inputField.value = ''; 
             inputField.placeholder = `ผิดครั้งที่ ${wrongCount}/6 ลองใหม่!`;
         }
     }
+}
+} // ปีกกาปิดสุดท้ายของฟังก์ชัน
+
+
+
+    // กันการลากรูป
+
+    window.addEventListener('dragstart', e => { if (e.target.tagName === 'IMG') e.preventDefault(); });
+
+    window.onload = startGame;
+
+</script>
