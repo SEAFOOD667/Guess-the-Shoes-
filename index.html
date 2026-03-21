@@ -372,6 +372,33 @@
             if (typeof animeData !== 'undefined') {
         document.getElementById('total-chars').innerText = animeData.length;
     }
+            // 1. กรองเอาเฉพาะตัวที่ยังไม่ถูก "Flag" ว่าทายถูก
+    const remainingOptions = animeData.filter(char => !char.solved);
+
+    const totalDisplay = document.getElementById('total-chars');
+    if(totalDisplay) totalDisplay.innerText = animeData.length;
+
+    const board = document.getElementById('game-board');
+    board.innerHTML = '';
+
+    // เช็คว่าถ้าทายครบหมดแล้ว (ไม่มีตัวเหลือให้กรอง)
+    if (remainingOptions.length === 0) {
+        board.innerHTML = `<h2 style="text-align:center; width:100%;">🎉 ทายครบหมดแล้ว 106 ตัว! เก่งมากครับ!</h2>`;
+        return;
+    }
+
+    // 2. สุ่มจากตัวที่เหลือ (remainingOptions)
+    const countToPick = Math.min(3, remainingOptions.length);
+    const shuffled = [...remainingOptions].sort(() => 0.5 - Math.random()).slice(0, countToPick);
+
+    shuffled.forEach((char, i) => {
+        const card = document.createElement('div');
+        card.className = 'character-card';
+        card.id = `card-${i}`;
+        
+        // ส่งชื่อตัวแรก (Index 0) ไปเก็บไว้เป็น Reference สำหรับการ Flag
+        card.dataset.refName = char.names[0]; 
+        card.dataset.answers = JSON.stringify(char.names);
             // 2.1 ล้างกระดานเกมเดิมออกก่อน
             const board = document.getElementById('game-board');
             board.innerHTML = '';
