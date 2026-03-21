@@ -460,6 +460,12 @@
                 if (detectiveIcon) detectiveIcon.style.opacity = "0";
                 card.classList.add('correct'); // ใส่ Class ตกแต่งว่าถูก
                 card.style.borderColor = "#00ff88"; // เปลี่ยนขอบเป็นสีเขียว
+                // 🚩 ส่วนที่เพิ่มเข้ามา: หาตัวละครใน animeData แล้ว Flag ว่าทายถูกแล้ว
+    const refName = card.dataset.refName;
+    const targetChar = animeData.find(c => c.names[0] === refName);
+    if (targetChar) {
+        targetChar.solved = true; // ฝังค่าลงไปในชุดข้อมูลเดิมเลย
+    }
                 solvedCount++; 
                 document.getElementById('current-score').innerText = solvedCount;
                 revealArea.style.display = 'block'; // แสดงชื่อเฉลย
