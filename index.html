@@ -51,10 +51,12 @@
 
         h1 { color: #00d4ff; text-shadow: 0 0 15px rgba(0,212,255,0.5); }
 
-<div class="score-board" style="text-align: center; color: white; font-size: 1.5rem; margin-bottom: 20px; font-family: 'Kanit', sans-serif;">
-    🏆 ทายถูกแล้ว: <span id="current-score" style="color: #00ff88; font-weight: bold;">0</span> 
-    / ทั้งหมด: <span id="total-chars" style="color: #00d4ff;">0</span> ตัว
-</div>
+.score-board {
+            text-align: center;
+            color: white;
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+        }
 
         .game-container {
     display: flex;
@@ -243,6 +245,10 @@
 <body>
     <h1>👟 Guess the Shoes!</h1>
     <p>ทายชื่อตัวละครจากรองเท้า (รองรับชื่อไทย/อังกฤษ)</p>
+    <div class="score-board">
+        🏆 ทายถูกแล้ว: <span id="current-score">0</span> 
+        / ทั้งหมด: <span id="total-chars">0</span> ตัว
+    </div>
 
     <div class="game-container" id="game-board"></div>
 
