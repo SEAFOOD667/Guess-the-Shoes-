@@ -425,6 +425,8 @@
                 if (wrongCount >= 6) {
                     // ถ้าผิดครบ 6 ครั้ง (เฉลยเลย)
                     if (mask) mask.style.height = "0"; // เปิดภาพหมด
+                    const detectiveIcon = card.querySelector('.mask'); 
+                    if (detectiveIcon) detectiveIcon.style.opacity = "0";
                     card.classList.add('wrong-final'); 
                     revealArea.style.display = 'block'; 
                     revealArea.style.color = '#ff4444'; // แสดงชื่อเฉลยเป็นสีแดง
