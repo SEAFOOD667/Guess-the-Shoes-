@@ -368,11 +368,11 @@
 
          let solvedCount = 0;
         // --- ส่วนที่ 2: ฟังก์ชันสำหรับเริ่มต้นเกม หรือ สุ่มใหม่ ---
-        function startGame() {
-            if (typeof animeData !== 'undefined') {
-        document.getElementById('total-chars').innerText = animeData.length;
-    }
-            // 1. กรองเอาเฉพาะตัวที่ยังไม่ถูก "Flag" ว่าทายถูก
+function startGame() {
+    // 1. เช็คความพร้อมของข้อมูล
+    if (typeof animeData === 'undefined') return;
+    
+    // 2. กรองเอาเฉพาะตัวที่ยังไม่ถูก "Flag" ว่าทายถูก
     const remainingOptions = animeData.filter(char => !char.solved);
 
     const totalDisplay = document.getElementById('total-chars');
@@ -381,62 +381,43 @@
     const board = document.getElementById('game-board');
     board.innerHTML = '';
 
-    // เช็คว่าถ้าทายครบหมดแล้ว (ไม่มีตัวเหลือให้กรอง)
+    // 3. เช็คว่าถ้าทายครบหมดแล้ว
     if (remainingOptions.length === 0) {
-        board.innerHTML = `<h2 style="text-align:center; width:100%;">🎉 ทายครบหมดแล้ว 106 ตัว! เก่งมากครับ!</h2>`;
+        board.innerHTML = `<h2 style="text-align:center; width:100%; color: #00ff88;">🎉 ทายครบหมดแล้ว ${animeData.length} ตัว! คุณคือปรมาจารย์!</h2>
+                           <button class="refresh-btn" onclick="location.reload()">เริ่มใหม่ทั้งหมด</button>`;
         return;
     }
 
-    // 2. สุ่มจากตัวที่เหลือ (remainingOptions)
+    // 4. สุ่มจากตัวที่เหลือ (remainingOptions) มาแค่ 3 ตัว
     const countToPick = Math.min(3, remainingOptions.length);
     const shuffled = [...remainingOptions].sort(() => 0.5 - Math.random()).slice(0, countToPick);
 
+    // 5. สร้างการ์ด
     shuffled.forEach((char, i) => {
         const card = document.createElement('div');
         card.className = 'character-card';
         card.id = `card-${i}`;
         
-        // ส่งชื่อตัวแรก (Index 0) ไปเก็บไว้เป็น Reference สำหรับการ Flag
+        // สำคัญ: เก็บชื่ออ้างอิงเพื่อใช้ Flag ตอนทายถูก
         card.dataset.refName = char.names[0]; 
         card.dataset.answers = JSON.stringify(char.names);
-            // 2.1 ล้างกระดานเกมเดิมออกก่อน
-            const board = document.getElementById('game-board');
-            board.innerHTML = '';
+        card.dataset.wrongCount = 0; 
 
-            // 2.2 สุ่มลำดับตัวละครใหม่ และเลือกมาแค่ 5 ตัว
-            const shuffled = [...animeData].sort(() => 0.3 - Math.random()).slice(0, 3);
-
-            // 2.3 สร้างการ์ดตัวละครแต่ละตัวลงบนหน้าจอ
-            shuffled.forEach((char, i) => {
-                const card = document.createElement('div');
-                card.className = 'character-card';
-                card.id = `card-${i}`;
-                
-                // เก็บคำตอบที่ถูกต้องไว้ใน Data Attribute (ในรูปแบบ JSON)
-                card.dataset.answers = JSON.stringify(char.names);
-                // ตัวนับจำนวนครั้งที่ตอบผิด เริ่มต้นที่ 0
-                card.dataset.wrongCount = 0; 
-
-                // 2.4 ใส่โครงสร้าง HTML ข้างในการ์ด (รูปภาพ, ช่องกรอก, ปุ่ม)
-                card.innerHTML = `
-                  <div class="img-box" style="position: relative; overflow: hidden; height: 500px; width: 100%; border-radius: 12px; border: 2px solid #ddd; background: #787878; display: flex; align-items: flex-end; justify-content: center;">
-    
-                  <div class="mask" style="position: absolute; top: 0; left: 0; width: 100%; height: 82%; background: #000; z-index: 2; transition: height 0.5s ease-out; border-bottom: 2px dashed #00d4ff; display: flex; align-items: center; justify-content: center; font-size: 3rem;">🕵️‍♂️</div>
-    
-                    <img src="${char.img}" class="character-img" draggable="false" oncontextmenu="return false;" 
+        card.innerHTML = `
+            <div class="img-box" style="position: relative; overflow: hidden; height: 500px; width: 100%; border-radius: 12px; border: 2px solid #ddd; background: #787878; display: flex; align-items: flex-end; justify-content: center;">
+                <div class="mask" style="position: absolute; top: 0; left: 0; width: 100%; height: 82%; background: #000; z-index: 2; transition: height 0.5s ease-out; border-bottom: 2px dashed #00d4ff; display: flex; align-items: center; justify-content: center; font-size: 3rem;">🕵️‍♂️</div>
+                <img src="${char.img}" class="character-img" draggable="false" oncontextmenu="return false;" 
                      style="width: 100%; height: 100%; object-fit: contain; object-position: center bottom;">
-                 </div>
-
-                  <div class="input-area" style="width: 100%;">
-                    <input type="text" placeholder="ชื่อตัวละคร..." id="in-${i}" style="width: 100%; box-sizing: border-box; font-size: 1.2rem; padding: 12px;">
-                  <button class="check-btn" onclick="checkAnswer(${i})" style="width: 100%; margin-top: 10px; padding: 12px; font-size: 1.1rem;">ตรวจคำตอบ</button>
-               </div>
-
-                  <div class="reveal-name" style="text-align: center; font-size: 1.5rem; margin-top: 10px;">✨ ${char.names[0]} (${char.names[1].toUpperCase()}) ✨</div>
+            </div>
+            <div class="input-area" style="width: 100%;">
+                <input type="text" placeholder="ชื่อตัวละคร..." id="in-${i}" style="width: 100%; box-sizing: border-box; font-size: 1.2rem; padding: 12px;" onkeypress="if(event.key === 'Enter') checkAnswer(${i})">
+                <button class="check-btn" onclick="checkAnswer(${i})" style="width: 100%; margin-top: 10px; padding: 12px; font-size: 1.1rem;">ตรวจคำตอบ</button>
+            </div>
+            <div class="reveal-name" style="text-align: center; font-size: 1.5rem; margin-top: 10px;">✨ ${char.names[0]} ✨</div>
         `;
-                board.appendChild(card);
-            });
-        }
+        board.appendChild(card);
+    });
+}
 
         // --- ส่วนที่ 3: ฟังก์ชันตรวจคำตอบเมื่อกดปุ่ม ---
         
