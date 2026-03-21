@@ -399,8 +399,7 @@
             
             // ดึงรายการคำตอบที่ถูกต้องออกมาเช็ค
             const correctAnswers = JSON.parse(card.dataset.answers);
-            const isCorrect = correctAnswers.some(name => name.toLowerCase() === userInput);
-
+            const isCorrect = correctAnswers.some(name => name.trim().toLowerCase() === userInput);
             // ดึงจำนวนครั้งที่เคยตอบผิดมานับต่อ
             let wrongCount = parseInt(card.dataset.wrongCount) || 0;
 
