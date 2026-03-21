@@ -372,7 +372,7 @@
             board.innerHTML = '';
 
             // 2.2 สุ่มลำดับตัวละครใหม่ และเลือกมาแค่ 5 ตัว
-            const shuffled = [...animeData].sort(() => 0.5 - Math.random()).slice(0, 5);
+            const shuffled = [...animeData].sort(() => 0.3 - Math.random()).slice(0, 3);
 
             // 2.3 สร้างการ์ดตัวละครแต่ละตัวลงบนหน้าจอ
             shuffled.forEach((char, i) => {
