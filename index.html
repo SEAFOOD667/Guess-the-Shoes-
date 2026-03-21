@@ -418,37 +418,52 @@ function startGame() {
 
 
 
-    function checkAnswer(i) {
+function checkAnswer(i) {
+    const inputField = document.getElementById(`in-${i}`);
+    const userInput = inputField.value.trim().toLowerCase();
+    const card = document.getElementById(`card-${i}`);
+    const mask = card.querySelector('.mask');
+    const correctAnswers = JSON.parse(card.dataset.answers);
+    const isCorrect = correctAnswers.some(name => name.toLowerCase() === userInput);
 
-        const userInput = document.getElementById(`in-${i}`).value.trim().toLowerCase();
+    // สร้างระบบนับจำนวนครั้งที่ผิดไว้ที่ตัว card
+    let wrongCount = parseInt(card.dataset.wrongCount) || 0;
 
-        const card = document.getElementById(`card-${i}`);
+    if (isCorrect) {
+        card.classList.add('correct');
+    } else {
+        wrongCount++;
+        card.dataset.wrongCount = wrongCount;
 
-        const correctAnswers = JSON.parse(card.dataset.answers);
+        // คำนวณระดับการเปิดภาพ (จาก 82% ลดลงทีละประมาณ 13.6% จนเหลือ 0%)
+        const newHeight = Math.max(0, 82 - (wrongCount * 13.6)); 
+        if (mask) mask.style.height = newHeight + "%";
 
-        const isCorrect = correctAnswers.some(name => name.toLowerCase() === userInput);
-
-
-
-        if (isCorrect) {
-
-            card.classList.add('correct');
-
+        if (wrongCount >= 6) {
+            // กรณีผิดครบ 6 ครั้ง
+            card.classList.add('wrong-final'); 
+            if (mask) mask.style.height = "0%"; // เปิดภาพทั้งหมด
+            
+            const revealArea = card.querySelector('.reveal-name');
+            if (revealArea) {
+                revealArea.style.display = 'block';
+                revealArea.innerHTML = `❌ ตอบผิดเกินกำหนด! เฉลยคือ: ${revealArea.innerHTML}`;
+            }
+            
+            card.querySelector('.input-area').style.display = 'none';
         } else {
-
+            // เอฟเฟกต์สั่นเมื่อตอบผิดปกติ
             card.style.transform = "translateX(8px)";
-
             setTimeout(() => card.style.transform = "translateX(-8px)", 80);
-
             setTimeout(() => card.style.transform = "translateX(0)", 160);
-
             card.style.borderColor = "#ff4444";
-
             setTimeout(() => card.style.borderColor = "#333", 1000);
-
+            
+            inputField.value = ''; 
+            inputField.placeholder = `ผิดครั้งที่ ${wrongCount}/6 ลองใหม่!`;
         }
-
     }
+}
 
 
 
