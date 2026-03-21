@@ -358,9 +358,6 @@
             { names: ["ซันจิ", "sanji"], img: "images/0106sanji.png" },
 
         ];
-
-// --- วางโค้ดส่วนนี้ต่อท้ายลงไปเลย ---ฆ
-    let currentSessionSolved = [];
         
 function startGame() {
 
@@ -430,48 +427,96 @@ function startGame() {
 
     }
 
+// 1. เพิ่มตัวแปรเก็บรายชื่อที่ตอบถูกไว้บนสุด (นอกฟังก์ชัน)
+let currentSessionSolved = [];
 
+function startGame() {
+    const board = document.getElementById('game-board');
+    board.innerHTML = '';
 
-// 1. หาฟังก์ชันนี้ในไฟล์ของคุณ
+    // กรองตัวละครที่ยังไม่เคยตอบถูกในรอบนี้
+    let availableCharacters = animeData.filter(char => !currentSessionSolved.includes(char.names[0]));
+
+    // ถ้าเหลือตัวละครไม่ถึง 5 ตัว ให้ล้างค่าใหม่
+    if (availableCharacters.length < 5) {
+        currentSessionSolved = [];
+        availableCharacters = [...animeData];
+    }
+
+    // สุ่มตัวละคร 5 ตัวจากตัวที่เหลืออยู่
+    const shuffled = availableCharacters.sort(() => 0.5 - Math.random()).slice(0, 5);
+
+    shuffled.forEach((char, i) => {
+        const card = document.createElement('div');
+        card.className = 'character-card';
+        card.id = `card-${i}`;
+        card.dataset.answers = JSON.stringify(char.names);
+        card.dataset.wrongCount = 0; // เพิ่มตัวนับความผิดให้แต่ละการ์ด
+
+        card.innerHTML = `
+            <div class="img-box" style="position: relative; overflow: hidden; height: 350px; width: 100%; border-radius: 12px; border: 2px solid #333; background: #000; transition: 0.3s; margin-bottom: 15px; display: flex; align-items: flex-end; justify-content: center;">
+                <div class="mask" style="position: absolute; top: 0; left: 0; width: 100%; height: 82%; background: #000; z-index: 2; transition: height 0.5s ease-out; border-bottom: 2px dashed #00d4ff; display: flex; align-items: center; justify-content: center;">🕵️‍♂️</div>
+                <img src="${char.img}" class="character-img" draggable="false" oncontextmenu="return false;" 
+                     style="max-width: 100%; max-height: 100%; width: auto; height: auto; object-fit: contain;">
+            </div>
+            <div class="input-area">
+                <input type="text" placeholder="ชื่อตัวละคร..." id="in-${i}">
+                <button class="check-btn" onclick="checkAnswer(${i})">ตรวจคำตอบ</button>
+            </div>
+            <div class="reveal-name" style="display: none; font-weight: bold; margin-top: 10px; font-size: 1.1rem;">
+                ✨ ${char.names[0]} (${char.names[1].toUpperCase()}) ✨
+            </div>
+        `;
+        board.appendChild(card);
+    });
+}
+
 function checkAnswer(i) {
-    
-    // --- ลบของเก่าออกให้หมด แล้วเอาโค้ดข้างล่างนี้ไปวางแทน ---
-
     const inputField = document.getElementById(`in-${i}`);
     const userInput = inputField.value.trim().toLowerCase();
     const card = document.getElementById(`card-${i}`);
     const mask = card.querySelector('.mask');
+    const revealArea = card.querySelector('.reveal-name');
     const correctAnswers = JSON.parse(card.dataset.answers);
     const isCorrect = correctAnswers.some(name => name.toLowerCase() === userInput);
 
     let wrongCount = parseInt(card.dataset.wrongCount) || 0;
 
-if (isCorrect) {
+    if (isCorrect) {
+        // กรณีตอบถูก
         if (mask) mask.style.height = "0"; 
         card.classList.add('correct');
-        const charName = JSON.parse(card.dataset.answers)[0]; 
+        card.style.borderColor = "#00ff88";
+        
+        // แสดงชื่อเฉลย
+        revealArea.style.display = 'block';
+        revealArea.style.color = '#00ff88';
+        card.querySelector('.input-area').style.display = 'none';
+
+        // บันทึกว่าตัวนี้ตอบถูกแล้ว (เพื่อให้ครั้งหน้าไม่สุ่มเจอ)
+        const charName = correctAnswers[0]; 
         if (!currentSessionSolved.includes(charName)) {
             currentSessionSolved.push(charName);
         }
-    }
-        card.style.borderColor = "#00ff88";
     } else {
+        // กรณีตอบผิด
         wrongCount++;
         card.dataset.wrongCount = wrongCount;
 
-        // คำนวณการเปิดภาพทีละนิด (จาก 82% ลดลงทีละ 13.6%)
+        // ค่อยๆ เปิดภาพ (ลดความสูง Mask)
         const newHeight = Math.max(0, 82 - (wrongCount * 13.6)); 
         if (mask) mask.style.height = newHeight + "%";
 
         if (wrongCount >= 6) {
+            // ผิดครบ 6 ครั้ง เฉลยเลย
             card.classList.add('wrong-final'); 
             if (mask) mask.style.height = "0"; 
             
-            const revealArea = card.querySelector('.reveal-name');
             if (revealArea) {
                 revealArea.style.display = 'block';
-                const originalName = revealArea.innerText.replace('✨', '').trim();
-                revealArea.innerHTML = `❌ ผิดเกินกำหนด! คือ <b>${originalName}</b>`;
+                revealArea.style.color = '#ff4444';
+                const originalName = correctAnswers[0];
+                revealArea.innerHTML = `❌ ผิดเกินกำหนด! เฉลยคือ: <b>${originalName}</b>`;
             }
             card.querySelector('.input-area').style.display = 'none';
         } else {
@@ -490,14 +535,4 @@ if (isCorrect) {
             inputField.placeholder = `ผิดครั้งที่ ${wrongCount}/6 ลองใหม่!`;
         }
     }
-} // ปีกกาปิดสุดท้ายของฟังก์ชัน
-
-
-
-    // กันการลากรูป
-
-    window.addEventListener('dragstart', e => { if (e.target.tagName === 'IMG') e.preventDefault(); });
-
-    window.onload = startGame;
-
-</script>
+}
