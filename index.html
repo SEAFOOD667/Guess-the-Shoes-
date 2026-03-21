@@ -62,7 +62,8 @@
     width: 95%;              /* ใช้พื้นที่ 95% ของหน้าจอ */
     max-width: 1400px;       /* กว้างสุดไม่เกินนี้ */
     margin: 20px auto;
-    overflow: hidden;        /* ปิดแถบเลื่อนทิ้งไปเลย */
+    overflow: visible !important;
+    padding: 20px 10px; 
 }
 
 
@@ -140,8 +141,11 @@
 
         .correct {
     transform: scale(1.05); /* ขยายใหญ่ขึ้น 5% */
-    box-shadow: 0 0 20px rgba(0, 255, 136, 0.5); /* เรืองแสงสีเขียว */
-    border-color: #00ff88 !important;
+    box-shadow: 0 0 25px 10px rgba(0, 255, 136, 0.7); /* เรืองแสงสีเขียว */
+    border: 3px solid #00ff88 !important;
+/* สำคัญ: เพื่อให้ box-shadow แสดงผลได้ดี */
+    position: relative; 
+    z-index: 10; /* ดันการ์ดที่ถูกขึ้นมาข้างบนสุด */
 }
         .correct .mask { height: 0; border: none; }
 
