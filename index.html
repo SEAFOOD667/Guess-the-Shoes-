@@ -358,6 +358,10 @@
             { names: ["ซันจิ", "sanji"], img: "images/0106sanji.png" },
 
         ];
+
+// --- วางโค้ดส่วนนี้ต่อท้ายลงไปเลย ---ฆ
+    let currentSessionSolved = [];
+        
 function startGame() {
 
         const board = document.getElementById('game-board');
@@ -368,7 +372,17 @@ function startGame() {
 
         // สุ่มตัวละคร 5 ตัว
 
-        const shuffled = [...animeData].sort(() => 0.5 - Math.random()).slice(0, 5);
+        // 1. กรองตัวละครที่ยังไม่เคยตอบถูกในรอบนี้
+        let availableCharacters = animeData.filter(char => !currentSessionSolved.includes(char.names[0]));
+
+        // 2. ถ้าเหลือตัวละครไม่ถึง 5 ตัว ให้ล้างค่าใหม่เพื่อให้เกมเล่นต่อได้
+        if (availableCharacters.length < 5) {
+            currentSessionSolved = [];
+            availableCharacters = [...animeData];
+        }
+
+        // 3. สุ่มตัวละคร 5 ตัวจากตัวที่เหลืออยู่
+        const shuffled = availableCharacters.sort(() => 0.5 - Math.random()).slice(0, 5);
 
 
 
@@ -432,10 +446,14 @@ function checkAnswer(i) {
 
     let wrongCount = parseInt(card.dataset.wrongCount) || 0;
 
-    if (isCorrect) {
-        // แก้บั๊ก: สั่งให้ mask หายไปทันที (ความสูงเป็น 0)
+if (isCorrect) {
         if (mask) mask.style.height = "0"; 
         card.classList.add('correct');
+        const charName = JSON.parse(card.dataset.answers)[0]; 
+        if (!currentSessionSolved.includes(charName)) {
+            currentSessionSolved.push(charName);
+        }
+    }
         card.style.borderColor = "#00ff88";
     } else {
         wrongCount++;
