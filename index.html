@@ -360,6 +360,7 @@
             { names: ["ซันจิ", "sanji"], img: "images/0106sanji.png" },
 ];
 
+         let solvedCount = 0;
         // --- ส่วนที่ 2: ฟังก์ชันสำหรับเริ่มต้นเกม หรือ สุ่มใหม่ ---
         function startGame() {
             document.getElementById('total-chars').innerText = allCharacters.length;
@@ -403,7 +404,6 @@
         }
 
         // --- ส่วนที่ 3: ฟังก์ชันตรวจคำตอบเมื่อกดปุ่ม ---
-        let solvedCount = 0;
         
         function checkAnswer(i) {
             const inputField = document.getElementById(`in-${i}`); // ช่องกรอก
