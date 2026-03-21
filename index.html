@@ -362,6 +362,7 @@
 
         // --- ส่วนที่ 2: ฟังก์ชันสำหรับเริ่มต้นเกม หรือ สุ่มใหม่ ---
         function startGame() {
+            document.getElementById('total-chars').innerText = allCharacters.length;
             // 2.1 ล้างกระดานเกมเดิมออกก่อน
             const board = document.getElementById('game-board');
             board.innerHTML = '';
@@ -402,6 +403,8 @@
         }
 
         // --- ส่วนที่ 3: ฟังก์ชันตรวจคำตอบเมื่อกดปุ่ม ---
+        let solvedCount = 0;
+        
         function checkAnswer(i) {
             const inputField = document.getElementById(`in-${i}`); // ช่องกรอก
             const userInput = inputField.value.trim().toLowerCase(); // คำที่ผู้เล่นพิมพ์มา
@@ -422,6 +425,8 @@
                 if (detectiveIcon) detectiveIcon.style.opacity = "0";
                 card.classList.add('correct'); // ใส่ Class ตกแต่งว่าถูก
                 card.style.borderColor = "#00ff88"; // เปลี่ยนขอบเป็นสีเขียว
+                solvedCount++; 
+                document.getElementById('current-score').innerText = solvedCount;
                 revealArea.style.display = 'block'; // แสดงชื่อเฉลย
                 card.querySelector('.input-area').style.display = 'none'; // ซ่อนช่องกรอก
             } else {
