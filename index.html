@@ -387,20 +387,21 @@
 
                 // 2.4 ใส่โครงสร้าง HTML ข้างในการ์ด (รูปภาพ, ช่องกรอก, ปุ่ม)
                 card.innerHTML = `
-                    <div class="img-box" style="position: relative; overflow: hidden; height: 350px; width: 100%; border-radius: 12px; border: 2px solid #ddd; background: #787878; transition: 0.3s; margin-bottom: 15px; display: flex; align-items: flex-end; justify-content: center;">
-                        <div class="mask" style="position: absolute; top: 0; left: 0; width: 100%; height: 82%; background: #000; z-index: 2; transition: height 0.5s ease-out; border-bottom: 2px dashed #00d4ff; display: flex; align-items: center; justify-content: center;">🕵️‍♂️</div>
-                        <img src="${char.img}" class="character-img" draggable="false" oncontextmenu="return false;" style="max-width: 100%; max-height: 100%; width: auto; height: auto; object-fit: contain;">
-                    </div>
+                  <div class="img-box" style="position: relative; overflow: hidden; height: 600px; width: 450px; border-radius: 15px; border: 3px solid #ddd; background: #fdf5e6; display: flex; align-items: flex-end; justify-content: center; margin: 0 auto 15px auto;">
+        
+                   <div class="mask" style="position: absolute; top: 0; left: 0; width: 100%; height: 82%; background: #000; z-index: 2; transition: height 0.5s ease-out; border-bottom: 3px dashed #00d4ff; display: flex; align-items: center; justify-content: center; font-size: 5rem;">🕵️‍♂️</div>
+        
+                   <img src="${char.img}" class="character-img" draggable="false" oncontextmenu="return false;" 
+                    style="width: 100%; height: 100%; object-fit: contain; transform: scale(1.4); transform-origin: bottom; filter: drop-shadow(0px 5px 15px rgba(0,0,0,0.1));">
+                  </div>
 
-                    <div class="input-area">
-                        <input type="text" placeholder="ชื่อตัวละคร..." id="in-${i}">
-                        <button class="check-btn" onclick="checkAnswer(${i})">ตรวจคำตอบ</button>
-                    </div>
+                  <div class="input-area" style="width: 450px; margin: 0 auto;">
+                    <input type="text" placeholder="ชื่อตัวละคร..." id="in-${i}" style="width: 100%; box-sizing: border-box; font-size: 1.2rem; padding: 12px;">
+                  <button class="check-btn" onclick="checkAnswer(${i})" style="width: 100%; margin-top: 10px; padding: 12px; font-size: 1.1rem;">ตรวจคำตอบ</button>
+               </div>
 
-                    <div class="reveal-name" style="display: none; font-weight: bold; margin-top: 10px; font-size: 1.1rem; color: #00ff88;">
-                        ✨ ${char.names[0]} (${char.names[1].toUpperCase()}) ✨
-                    </div>
-                `;
+                  <div class="reveal-name" style="text-align: center; font-size: 1.5rem; margin-top: 10px;">✨ ${char.names[0]} (${char.names[1].toUpperCase()}) ✨</div>
+        `;
                 board.appendChild(card);
             });
         }
