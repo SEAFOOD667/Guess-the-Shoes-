@@ -363,7 +363,7 @@
             { names: ["คาเนกิ", "kaneki"], img: "images/0104kaneki.png" },
             { names: ["ซาสึเกะ", "sasuke"], img: "images/0105sasuke.png" },
             { names: ["ไซตามะ", "saitama"], img: "images/0106saitama.png" },
-            { names: ["ซันจิ", "sanji"], img: "images/0106sanji.png" },
+            { names: ["ซันจิ", "sanji"], img: "images/0107sanji.png" },
 ];
 
          let solvedCount = 0;
@@ -374,6 +374,33 @@ function startGame() {
     
     // 2. กรองเอาเฉพาะตัวที่ยังไม่ถูก "Flag" ว่าทายถูก
     const remainingOptions = animeData.filter(char => !char.solved);
+    // 🚩 อัปเดตตัวเลข Score Board ทุกครั้งที่สุ่มใหม่
+    const solvedCountActual = animeData.filter(c => c.solved).length;
+    document.getElementById('current-score').innerText = solvedCountActual;
+    document.getElementById('total-chars').innerText = animeData.length;
+
+    const board = document.getElementById('game-board');
+    board.innerHTML = '';
+
+    if (remainingOptions.length === 0) {
+        board.innerHTML = `<div style="grid-column: 1/-1; text-align:center; width:100%;">
+            <h2 style="color: #00ff88;">🎉 ทายครบหมดแล้ว ${animeData.length} ตัว!</h2>
+            <button class="refresh-btn" onclick="location.reload()">เริ่มใหม่ทั้งหมด</button>
+        </div>`;
+        return;
+    }
+    // สุ่มจากตัวที่เหลือ
+    const countToPick = Math.min(3, remainingOptions.length);
+    const shuffled = [...remainingOptions].sort(() => 0.5 - Math.random()).slice(0, countToPick);
+
+    shuffled.forEach((char, i) => {
+        // ... โค้ดสร้าง Card (ใช้ตามที่คุณเขียนมาได้เลย แต่ต้องมี dataset.refName) ...
+        const card = document.createElement('div');
+        card.className = 'character-card';
+        card.id = `card-${i}`;
+        card.dataset.refName = char.names[0]; // สำคัญมากสำหรับเชื่อมโยงข้อมูล
+        card.dataset.answers = JSON.stringify(char.names);
+        card.dataset.wrongCount = 0;
 
     const totalDisplay = document.getElementById('total-chars');
     if(totalDisplay) totalDisplay.innerText = animeData.length;
@@ -447,6 +474,13 @@ function startGame() {
     if (targetChar) {
         targetChar.solved = true; // ฝังค่าลงไปในชุดข้อมูลเดิมเลย
     }
+                // 🚩 แก้ไขจุดนี้: นับคะแนนจากข้อมูลจริงที่มีสถานะ solved: true
+    const currentSolved = animeData.filter(c => c.solved).length;
+    document.getElementById('current-score').innerText = currentSolved;
+
+    revealArea.style.display = 'block';
+    card.querySelector('.input-area').style.display = 'none';
+}
                 solvedCount++; 
                 document.getElementById('current-score').innerText = solvedCount;
                 revealArea.style.display = 'block'; // แสดงชื่อเฉลย
