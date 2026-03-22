@@ -462,7 +462,11 @@ function checkAnswer(i) {
 
     if (isCorrect) {
         // ตอบถูก
-        if (mask) mask.style.height = "0";
+        if (mask) {
+            mask.style.height = "0"; // รูดม่านขึ้น
+            mask.style.opacity = "0"; // จางหายไป (กันอีโมจิค้าง)
+            mask.style.pointerEvents = "none"; // กันคลิกโดน
+        }
         card.classList.add('correct');
         card.style.borderColor = "#00ff88";
         
@@ -486,7 +490,10 @@ function checkAnswer(i) {
         if (mask) mask.style.height = newHeight + "%";
 
         if (wrongCount >= 6) {
-            if (mask) mask.style.height = "0";
+            if (mask) {
+                mask.style.height = "0";
+                mask.style.opacity = "0"; // เพิ่มบรรทัดนี้ครับ!
+            }
             revealArea.style.display = 'block'; 
             revealArea.style.color = '#ff4444';
             revealArea.innerHTML = `❌ เฉลยคือ: <b>${correctAnswers[0]}</b>`;
