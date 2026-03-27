@@ -400,10 +400,10 @@
 function startGame() {
     if (typeof animeData === 'undefined') return;
 
-    // 1. กรองตัวที่ยังไม่ถูกทาย
+    // 1. ดึงตัวที่ "ยังไม่ถูกทาย"
     const remainingOptions = animeData.filter(char => !char.solved);
 
-    // 2. อัปเดตตัวเลข Score Board
+    // 2. อัปเดตตัวเลขคะแนนบนหน้าจอ
     const solvedCountActual = animeData.filter(c => c.solved).length;
     document.getElementById('current-score').innerText = solvedCountActual;
     document.getElementById('total-chars').innerText = animeData.length;
@@ -411,36 +411,48 @@ function startGame() {
     const board = document.getElementById('game-board');
     board.innerHTML = '';
 
-    // 3. เช็คจบเกม
+    // 3. ถ้าทายครบหมดแล้วให้โชว์ข้อความฉลอง
     if (remainingOptions.length === 0) {
-        board.innerHTML = `<div style="grid-column: 1/-1; text-align:center; width:100%;">
-            <h2 style="color: #00ff88; font-size: 2rem;">🎉 ทายครบหมดแล้ว ${animeData.length} ตัว! คุณคือปรมาจารย์!</h2>
-            <button class="refresh-btn" onclick="location.reload()">เริ่มใหม่ทั้งหมด</button>
+        board.innerHTML = `<div style="grid-column: 1/-1; text-align:center; width:100%; padding: 40px;">
+            <h2 style="color: #00ff88; font-size: 2.5rem;">🎉 ยินดีด้วย! คุณทายครบ ${animeData.length} ตัวแล้ว!</h2>
+            <button class="refresh-btn" onclick="location.reload()" style="padding: 15px 30px; font-size: 1.2rem; cursor:pointer;">เริ่มใหม่ทั้งหมด</button>
         </div>`;
         return;
     }
 
-    // 4. สุ่มจากตัวที่เหลือมา 3 ตัว (หรือตามที่เหลือจริง)
+    // 4. สร้างรายชื่อ Autocomplete (เอาเฉพาะตัวที่ยังไม่ถูกทายมาโชว์ในลิสต์)
+    const allNamesHTML = remainingOptions.map(char => `<option value="${char.names[0]}">`).join('');
+
+    // 5. สุ่มตัวละครมา 3 ตัวจากที่เหลือ
     const countToPick = Math.min(3, remainingOptions.length);
     const shuffled = [...remainingOptions].sort(() => 0.5 - Math.random()).slice(0, countToPick);
 
-    // 5. สร้างการ์ดแสดงผล
+    // 6. สร้างการ์ดแสดงผล
     shuffled.forEach((char, i) => {
         const card = document.createElement('div');
         card.className = 'character-card';
         card.id = `card-${i}`;
+        
+        // เก็บข้อมูลสำคัญไว้ในการ์ด
         card.dataset.refName = char.names[0]; 
         card.dataset.answers = JSON.stringify(char.names);
         card.dataset.wrongCount = 0;
 
         card.innerHTML = `
             <div class="img-box" style="position: relative; overflow: hidden; height: 500px; width: 100%; border-radius: 12px; border: 2px solid #ddd; background: #787878; display: flex; align-items: flex-end; justify-content: center;">
-                <div class="mask" style="position: absolute; top: 0; left: 0; width: 100%; height: 82%; background: #000; z-index: 2; transition: height 0.5s ease-out; border-bottom: 2px dashed #00d4ff; display: flex; align-items: center; justify-content: center; font-size: 3rem;">🕵️‍♂️</div>
+                <div class="mask" style="position: absolute; top: 0; left: 0; width: 100%; height: 82%; background: #000; z-index: 2; transition: all 0.5s ease-out; border-bottom: 2px dashed #00d4ff; display: flex; align-items: center; justify-content: center; font-size: 3rem;">🕵️‍♂️</div>
                 <img src="${char.img}" class="character-img" draggable="false" oncontextmenu="return false;" 
                      style="width: 100%; height: 100%; object-fit: contain; object-position: center bottom;">
             </div>
             <div class="input-area" style="width: 100%; margin-top: 15px;">
-                <input type="text" placeholder="ชื่อตัวละคร..." id="in-${i}" style="width: 100%; box-sizing: border-box; font-size: 1.2rem; padding: 12px;" onkeypress="if(event.key === 'Enter') checkAnswer(${i})">
+                <input type="text" list="list-${i}" placeholder="พิมพ์ชื่อตัวละคร..." id="in-${i}" 
+                       style="width: 100%; box-sizing: border-box; font-size: 1.2rem; padding: 12px;" 
+                       onkeypress="if(event.key === 'Enter') checkAnswer(${i})">
+                
+                <datalist id="list-${i}">
+                    ${allNamesHTML}
+                </datalist>
+
                 <button class="check-btn" onclick="checkAnswer(${i})" style="width: 100%; margin-top: 10px; padding: 12px; font-size: 1.1rem; cursor: pointer;">ตรวจคำตอบ</button>
             </div>
             <div class="reveal-name" style="text-align: center; font-size: 1.5rem; margin-top: 10px; display: none;">✨ ${char.names[0]} ✨</div>
